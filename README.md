@@ -1,6 +1,11 @@
-# Cart-Pole Balancing with Genesis and PPO
+# Cart-Pole Control with RL and MPC
 
-This project trains a PPO reinforcement-learning policy to stabilize a cart-pole in the upright position using the [Genesis](https://genesis-world.readthedocs.io/) simulator and `rsl_rl`.
+This repository is organized into two independent cart-pole control approaches:
+
+- `RL/`: PPO reinforcement learning using the [Genesis](https://genesis-world.readthedocs.io/) simulator and `rsl_rl`.
+- `MPC/`: MATLAB model predictive control files.
+
+The RL implementation trains a policy to stabilize the cart-pole in the upright position. The `MPC/` folder is ready for the MATLAB implementation to be added.
 
 A trained PPO checkpoint is included, so evaluation can be run immediately after cloning and installing the dependencies.
 
@@ -10,15 +15,20 @@ The policy pushes only the cart. The pole joint is passive, and an angle of zero
 \theta_0 \sim \mathcal{U}(-20^\circ, 20^\circ)
 \]
 
-## Project structure
+## Repository structure
 
 ```text
-CartPole-RL/
-├── cartpole1.urdf       # Cart-pole model
-├── cartpole_env.py      # Genesis environment, rewards, observations, and resets
-├── cartpole_train.py    # PPO configuration and training entry point
-├── cartpole_eval.py     # Policy evaluation and keyboard disturbances
-└── requirements.txt     # Python dependencies
+CartPole-MPC-RL/
+├── RL/
+│   ├── cartpole1.urdf       # Cart-pole model
+│   ├── cartpole_env.py      # Genesis environment
+│   ├── cartpole_train.py    # PPO training
+│   ├── cartpole_eval.py     # Evaluation and keyboard disturbances
+│   ├── requirements.txt     # RL Python dependencies
+│   └── logs/                # Trained policies and result plots
+├── MPC/
+│   └── README.md            # Location for the MATLAB MPC files
+└── README.md
 ```
 
 ## Installation
@@ -42,7 +52,7 @@ If you already have a suitable Conda environment, activate it before running the
 
 ```bash
 conda activate rl
-python -m pip install -r requirements.txt
+python -m pip install -r RL/requirements.txt
 ```
 
 To create a new environment instead:
@@ -51,7 +61,7 @@ To create a new environment instead:
 conda create -n cartpole python=3.10 -y
 conda activate cartpole
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install -r RL/requirements.txt
 ```
 
 ### Option 2: Python virtual environment
@@ -60,7 +70,7 @@ python -m pip install -r requirements.txt
 python3.10 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install -r RL/requirements.txt
 ```
 
 After activation, verify that `python` belongs to the selected environment:
@@ -90,23 +100,23 @@ The project was tested with Genesis `0.4.6` and `rsl-rl-lib` `5.0.1`. For GPU tr
 With the environment still activated, run:
 
 ```bash
-python cartpole_eval.py
+python RL/cartpole_eval.py
 ```
 
 This loads the included checkpoint:
 
 ```text
-logs/CartPole-RL1/model_100.pt
+RL/logs/CartPole-RL1/model_100.pt
 ```
 
 The Genesis viewer opens with one cart-pole. Click the viewer and use the left and right arrow keys to apply force disturbances. Close the viewer or press `Ctrl+C` to stop and save the evaluation plot.
 
 ## Training
 
-Run from the repository directory:
+Run from the repository root:
 
 ```bash
-python cartpole_train.py
+python RL/cartpole_train.py
 ```
 
 Default training settings:
@@ -121,7 +131,7 @@ Default training settings:
 The three available command-line arguments are:
 
 ```bash
-python cartpole_train.py \
+python RL/cartpole_train.py \
   --exp_name CartPole-RL1 \
   --num_envs 4096 \
   --max_iterations 101
@@ -130,7 +140,7 @@ python cartpole_train.py \
 Training creates the following directory:
 
 ```text
-logs/CartPole-RL1/
+RL/logs/CartPole-RL1/
 ├── cfgs.pkl
 ├── model_0.pt
 ├── model_50.pt
@@ -139,14 +149,14 @@ logs/CartPole-RL1/
 └── training_plots.png
 ```
 
-`training_plots.png` contains the mean episode reward and mean episode length. The included `logs/` directory contains the trained checkpoints, saved configurations, TensorBoard event data, and result plots.
+`training_plots.png` contains the mean episode reward and mean episode length. The included `RL/logs/` directory contains the trained checkpoints, saved configurations, TensorBoard event data, and result plots.
 
 ## Evaluation
 
 Evaluate checkpoint 100 with:
 
 ```bash
-python cartpole_eval.py --exp_name CartPole-RL1 --ckpt 100
+python RL/cartpole_eval.py --exp_name CartPole-RL1 --ckpt 100
 ```
 
 Evaluation uses one environment and the CPU backend. Click the Genesis viewer, then use:
@@ -157,7 +167,7 @@ Evaluation uses one environment and the CPU backend. Click the Genesis viewer, t
 Close the viewer or press `Ctrl+C` to finish. The script saves:
 
 ```text
-logs/CartPole-RL1/evaluation_plots_100.png
+RL/logs/CartPole-RL1/evaluation_plots_100.png
 ```
 
 The evaluation plot shows pole angle, cart position, and keyboard disturbance force over time.
