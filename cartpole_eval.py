@@ -72,7 +72,7 @@ def main():
 
     runner = OnPolicyRunner(env, train_cfg, str(log_dir), device=gs.device)
     resume_path = log_dir / f"model_{args.ckpt}.pt"
-    runner.load(str(resume_path))
+    runner.load(str(resume_path), map_location=gs.device)
     policy = runner.get_inference_policy(device=gs.device)
     disturbance = {"force": 0.0, "steps_left": 0}
 
