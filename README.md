@@ -2,6 +2,8 @@
 
 This project trains a PPO reinforcement-learning policy to stabilize a cart-pole in the upright position using the [Genesis](https://genesis-world.readthedocs.io/) simulator and `rsl_rl`.
 
+A trained PPO checkpoint is included, so evaluation can be run immediately after cloning and installing the dependencies.
+
 The policy pushes only the cart. The pole joint is passive, and an angle of zero represents the upright position. At every episode reset, the initial pole angle is sampled from:
 
 \[
@@ -26,6 +28,8 @@ Python 3.10 and a CUDA-capable GPU are recommended for training.
 Create and activate a virtual environment, then install the dependencies:
 
 ```bash
+git clone https://github.com/abdullah-tm14/CartPole-MPC-RL.git
+cd CartPole-MPC-RL
 python3.10 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -33,6 +37,22 @@ pip install -r requirements.txt
 ```
 
 Install a CUDA-enabled PyTorch build appropriate for your machine if the environment does not already provide one. The project was tested with Genesis `0.4.6` and `rsl-rl-lib` `5.0.1`.
+
+## Run the trained policy
+
+After installation, simply run:
+
+```bash
+python cartpole_eval.py
+```
+
+This loads the included checkpoint:
+
+```text
+logs/CartPole-RL1/model_100.pt
+```
+
+The Genesis viewer opens with one cart-pole. Click the viewer and use the left and right arrow keys to apply force disturbances. Close the viewer or press `Ctrl+C` to stop and save the evaluation plot.
 
 ## Training
 
@@ -72,7 +92,7 @@ logs/CartPole-RL1/
 └── training_plots.png
 ```
 
-`training_plots.png` contains the mean episode reward and mean episode length. The `logs/` directory is ignored by Git because checkpoints and event files can be large.
+`training_plots.png` contains the mean episode reward and mean episode length. The included `logs/` directory contains the trained checkpoints, saved configurations, TensorBoard event data, and result plots.
 
 ## Evaluation
 
