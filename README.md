@@ -23,24 +23,71 @@ CartPole-RL/
 
 ## Installation
 
-Python 3.10 and a CUDA-capable GPU are recommended for training.
+Python 3.10 is recommended. A CUDA-capable GPU is recommended for training, while evaluation runs on the CPU.
 
-Create and activate a virtual environment, then install the dependencies:
+Cloning the repository does not install Python or the required packages. Running the scripts with an unprepared system Python can produce errors such as `python: command not found` or `No module named 'typing_extensions'`.
+
+First, clone the repository:
 
 ```bash
 git clone https://github.com/abdullah-tm14/CartPole-MPC-RL.git
 cd CartPole-MPC-RL
-python3.10 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
 ```
 
-Install a CUDA-enabled PyTorch build appropriate for your machine if the environment does not already provide one. The project was tested with Genesis `0.4.6` and `rsl-rl-lib` `5.0.1`.
+Then use either Conda or `venv`. Do not run both setup methods.
+
+### Option 1: Conda
+
+If you already have a suitable Conda environment, activate it before running the project:
+
+```bash
+conda activate rl
+python -m pip install -r requirements.txt
+```
+
+To create a new environment instead:
+
+```bash
+conda create -n cartpole python=3.10 -y
+conda activate cartpole
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### Option 2: Python virtual environment
+
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+After activation, verify that `python` belongs to the selected environment:
+
+```bash
+which python
+```
+
+### Installing Genesis manually
+
+Genesis is installed automatically by `requirements.txt`. If Genesis is missing, install the tested version directly:
+
+```bash
+python -m pip install genesis-world==0.4.6
+```
+
+You can confirm the installation with:
+
+```bash
+python -m pip show genesis-world
+```
+
+The project was tested with Genesis `0.4.6` and `rsl-rl-lib` `5.0.1`. For GPU training, install a CUDA-enabled PyTorch build appropriate for your CUDA version. The included evaluation uses the CPU backend.
 
 ## Run the trained policy
 
-After installation, simply run:
+With the environment still activated, run:
 
 ```bash
 python cartpole_eval.py
