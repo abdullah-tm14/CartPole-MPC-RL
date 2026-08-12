@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+
+# Training output
+logs/
+*.pt
+events.out.tfevents.*
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+
+# Supplied quadruped reference scripts (not part of this project)
+aware1_*.py
