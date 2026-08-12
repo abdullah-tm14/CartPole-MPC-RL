@@ -1,4 +1,5 @@
 genesis-world==0.4.6
 rsl-rl-lib==5.0.1
+typing-extensions>=4.10.0
 matplotlib
 tensorboard
