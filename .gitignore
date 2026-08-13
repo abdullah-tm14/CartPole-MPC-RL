@@ -1,10 +1,17 @@
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
 
 # Editors and operating systems
 .vscode/
 .idea/
 .DS_Store
+
+# MATLAB and Simulink generated files
+slprj/
+*.slxc
+*.autosave
 
 # Supplied quadruped reference scripts (not part of this project)
 aware1_*.py

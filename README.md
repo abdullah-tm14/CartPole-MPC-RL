@@ -1,196 +1,70 @@
-# Cart-Pole Control with RL and MPC
+# Control and Reinforcement Learning Projects
 
-This repository is organized into two independent cart-pole control approaches:
+This repository contains three control projects developed with MATLAB/Simulink and the [Genesis](https://genesis-world.readthedocs.io/) physics simulator:
 
-- `RL/`: PPO reinforcement learning using the [Genesis](https://genesis-world.readthedocs.io/) simulator and `rsl_rl`.
-- `MPC/`: MATLAB model predictive control files.
+- **Cart-pole with model predictive control (MPC):** a linearized cart-pole is stabilized in MATLAB and Simulink with an MPC controller.
+- **Cart-pole with reinforcement learning:** a PPO policy is trained in Genesis to balance the pole while controlling the cart.
+- **ANYmal C locomotion with reinforcement learning:** a 12-joint quadruped policy is trained in Genesis with PPO to follow forward, lateral, and turning velocity commands.
 
-The RL implementation trains a policy to stabilize the cart-pole in the upright position. The `MPC/` folder is ready for the MATLAB implementation to be added.
+The trained checkpoints, TensorBoard logs, plots, and demonstration videos are included so the experiments can be inspected and the trained policies can be evaluated after cloning.
 
-A trained PPO checkpoint is included, so evaluation can be run immediately after cloning and installing the dependencies.
+## Projects
 
-The policy pushes only the cart. The pole joint is passive, and an angle of zero represents the upright position. At every episode reset, the initial pole angle is sampled from:
-
-\[
-\theta_0 \sim \mathcal{U}(-20^\circ, 20^\circ)
-\]
+| Project | Method | Main tools | Instructions |
+| --- | --- | --- | --- |
+| Cart-pole RL | PPO | Python, Genesis, `rsl_rl` | [RL/README.md](RL/README.md) |
+| Cart-pole MPC | Model predictive control | MATLAB, Simulink, MPC Toolbox | [MPC/README.md](MPC/README.md) |
+| ANYmal C RL | PPO | Python, Genesis, `rsl_rl` | [Anymal-RL/README.md](Anymal-RL/README.md) |
 
 ## Repository structure
 
 ```text
-CartPole-MPC-RL/
-├── RL/
-│   ├── cartpole1.urdf       # Cart-pole model
-│   ├── cartpole_env.py      # Genesis environment
-│   ├── cartpole_train.py    # PPO training
-│   ├── cartpole_eval.py     # Evaluation and keyboard disturbances
-│   ├── requirements.txt     # RL Python dependencies
-│   └── logs/                # Trained policies and result plots
-├── MPC/
-│   └── README.md            # Location for the MATLAB MPC files
+.
+├── RL/                         # Genesis cart-pole PPO environment and scripts
+│   ├── logs/                   # Checkpoints, configurations, and TensorBoard logs
+│   └── Results/                # Evaluation plots and demonstration video
+├── MPC/                        # MATLAB/Simulink cart-pole MPC implementation
+│   └── Results and plots/      # Simulation plots, diagrams, and video
+├── Anymal-RL/                  # Genesis ANYmal C PPO environment and scripts
+│   ├── anymal_c_simple_description/  # Robot URDF and mesh assets
+│   ├── logs/                   # Checkpoints, configurations, and TensorBoard logs
+│   └── Results/                # Training/evaluation plots and video
 └── README.md
 ```
 
-## Installation
+## Quick start
 
-Python 3.10 is recommended. A CUDA-capable GPU is recommended for training, while evaluation runs on the CPU.
-
-Cloning the repository does not install Python or the required packages. Running the scripts with an unprepared system Python can produce errors such as `python: command not found` or `No module named 'typing_extensions'`.
-
-First, clone the repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/abdullah-tm14/CartPole-MPC-RL.git
 cd CartPole-MPC-RL
 ```
 
-Then use either Conda or `venv`. Do not run both setup methods.
+Each project has separate setup and run instructions:
 
-### Option 1: Conda
+- [Run or train the cart-pole PPO policy](RL/README.md)
+- [Run the MATLAB/Simulink MPC simulation](MPC/README.md)
+- [Run or train the ANYmal C PPO policy](Anymal-RL/README.md)
 
-If you already have a suitable Conda environment, activate it before running the project:
+The two reinforcement-learning projects use Python 3.10, Genesis `0.4.6`, and `rsl-rl-lib` `5.0.1`. Training is intended for a CUDA-capable GPU; the interactive evaluations also require a graphical desktop.
 
-```bash
-conda activate rl
-python -m pip install -r RL/requirements.txt
-```
+## Example results
 
-To create a new environment instead:
+### Cart-pole RL
 
-```bash
-conda create -n cartpole python=3.10 -y
-conda activate cartpole
-python -m pip install --upgrade pip
-python -m pip install -r RL/requirements.txt
-```
+![Cart-pole PPO training and evaluation plots](RL/Results/training_plots.png)
 
-### Option 2: Python virtual environment
+### Cart-pole MPC
 
-```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r RL/requirements.txt
-```
+![Cart-pole MPC response](MPC/Results%20and%20plots/response.jpg)
 
-After activation, verify that `python` belongs to the selected environment:
+### ANYmal C RL
 
-```bash
-which python
-```
+![ANYmal C training reward](Anymal-RL/Results/training_reward_progression.png)
 
-### Installing Genesis manually
+## Notes
 
-Genesis is installed automatically by `requirements.txt`. If Genesis is missing, install the tested version directly:
-
-```bash
-python -m pip install genesis-world==0.4.6
-```
-
-You can confirm the installation with:
-
-```bash
-python -m pip show genesis-world
-```
-
-The project was tested with Genesis `0.4.6` and `rsl-rl-lib` `5.0.1`. For GPU training, install a CUDA-enabled PyTorch build appropriate for your CUDA version. The included evaluation uses the CPU backend.
-
-## Run the trained policy
-
-With the environment still activated, run:
-
-```bash
-python RL/cartpole_eval.py
-```
-
-This loads the included checkpoint:
-
-```text
-RL/logs/CartPole-RL1/model_100.pt
-```
-
-The Genesis viewer opens with one cart-pole. Click the viewer and use the left and right arrow keys to apply force disturbances. Close the viewer or press `Ctrl+C` to stop and save the evaluation plot.
-
-## Training
-
-Run from the repository root:
-
-```bash
-python RL/cartpole_train.py
-```
-
-Default training settings:
-
-- Experiment name: `CartPole-RL1`
-- Parallel environments: `4096`
-- PPO iterations: `101`
-- Backend: GPU
-- Simulation timestep: `0.02 s`
-- Episode duration: `25 s` (`1250` simulation steps)
-
-The three available command-line arguments are:
-
-```bash
-python RL/cartpole_train.py \
-  --exp_name CartPole-RL1 \
-  --num_envs 4096 \
-  --max_iterations 101
-```
-
-Training creates the following directory:
-
-```text
-RL/logs/CartPole-RL1/
-├── cfgs.pkl
-├── model_0.pt
-├── model_50.pt
-├── model_100.pt
-├── events.out.tfevents.*
-└── training_plots.png
-```
-
-`training_plots.png` contains the mean episode reward and mean episode length. The included `RL/logs/` directory contains the trained checkpoints, saved configurations, TensorBoard event data, and result plots.
-
-## Evaluation
-
-Evaluate checkpoint 100 with:
-
-```bash
-python RL/cartpole_eval.py --exp_name CartPole-RL1 --ckpt 100
-```
-
-Evaluation uses one environment and the CPU backend. Click the Genesis viewer, then use:
-
-- **Left arrow:** apply a force disturbance to the left.
-- **Right arrow:** apply a force disturbance to the right.
-
-Close the viewer or press `Ctrl+C` to finish. The script saves:
-
-```text
-RL/logs/CartPole-RL1/evaluation_plots_100.png
-```
-
-The evaluation plot shows pole angle, cart position, and keyboard disturbance force over time.
-
-## Observations and action
-
-The four physical states are cart position, cart velocity, pole angle, and pole angular velocity. PPO receives five observations:
-
-```text
-[scaled cart position,
- scaled cart velocity,
- sin(pole angle),
- cos(pole angle),
- scaled pole angular velocity]
-```
-
-The angle uses sine and cosine to avoid a discontinuity between `-pi` and `+pi`. The policy outputs one action in `[-1, 1]`, which is scaled into a horizontal force applied to the cart.
-
-## Task termination
-
-An episode ends when any of the following occurs:
-
-- The configured episode duration is reached.
-- The pole angle exceeds `60 degrees` from upright.
-- The cart position exceeds `8 m` from the center.
-- Genesis reports a solver error.
+- Running a training script with an existing experiment name replaces that experiment's log directory. Use a new `--exp_name` to preserve the included runs.
+- Generated Python caches, editor files, and Simulink build caches are intentionally excluded. Results and training logs are intentionally versioned.
+- The ANYmal description assets retain their upstream license in `Anymal-RL/anymal_c_simple_description/LICENSE`.
